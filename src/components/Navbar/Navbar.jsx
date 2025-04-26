@@ -1,348 +1,177 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { motion } from "framer-motion"
-import { AppBar, Toolbar, Button, IconButton, Drawer, List, ListItem, ListItemText, Collapse, Box } from "@mui/material"
-import MenuIcon from "@mui/icons-material/Menu"
-import CloseIcon from "@mui/icons-material/Close"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import ExpandLessIcon from "@mui/icons-material/ExpandLess"
-import PhoneIcon from "@mui/icons-material/Phone"
-import WhatsAppIcon from "@mui/icons-material/WhatsApp"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const [expandedItems, setExpandedItems] = useState({
-    services: false,
-    resources: false,
-    industries: false,
-  })
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true)
-      } else {
-        setScrolled(false)
-      }
-    }
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  const navItems = [
+    { label: "Home", href: "/" },
+    { label: "About", href: "/about" },
+    { label: "Portfolio", href: "/portfolio" },
+    { label: "Blog", href: "/blog" },
+    { label: "Contact", href: "/contact" },
+  ];
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+  const serviceItems = [
+    { label: "Digital Marketing", href: "/services#digital-marketing" },
+    { label: "Web Development", href: "/services#web-development" },
+    { label: "App Development", href: "/services#app-development" },
+    { label: "SEO Optimization", href: "/services#seo" },
+    { label: "Social Media Marketing", href: "/services#social" },
+  ];
 
-  const toggleExpand = (item) => {
-    setExpandedItems((prev) => ({
-      ...prev,
-      [item]: !prev[item],
-    }))
-  }
+  const industryItems = [
+    { label: "Healthcare", href: "/industries#healthcare" },
+    { label: "Education", href: "/industries#education" },
+    { label: "E-Commerce", href: "/industries#ecommerce" },
+    { label: "Real Estate", href: "/industries#real-estate" },
+  ];
 
-  const navbarVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  }
-
-  const menuItemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: (i) => ({
-      opacity: 1,
-      x: 0,
-      transition: { delay: i * 0.1, duration: 0.5 },
-    }),
-  }
+  const renderDropdown = (title, items) => (
+    <div className="relative group">
+      <span
+        tabIndex={0}
+        className="cursor-pointer text-gray-700 hover:text-blue-600 flex items-center gap-1"
+      >
+        {title} ▾
+      </span>
+      <div className="absolute top-8 left-0 hidden group-hover:flex group-focus-within:flex flex-col bg-white shadow-lg rounded-md py-2 w-52 z-20">
+        {items.map(({ label, href }) => (
+          <Link key={label} href={href} className="px-4 py-2 text-sm hover:bg-gray-100">
+            {label}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
-    <>
-      {/* Top Bar with Contact Info */}
-      <Box className="bg-[rgb(var(--secondary))] text-white py-2 hidden md:block">
-        <div className="container-custom flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <a href="tel:+918809155327" className="flex items-center space-x-2 text-sm hover:text-gray-200">
-              <PhoneIcon fontSize="small" />
-              <span>+91 8809155327</span>
+    <header
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        scrolled ? "bg-white shadow-md" : "bg-transparent"
+      }`}
+    >
+      {/* Top Bar */}
+      <div className="bg-blue-600 text-white text-sm py-2 hidden md:block">
+        <div className="max-w-7xl mx-auto flex justify-between px-4">
+          <div className="flex gap-4">
+            <a href="tel:+918809155327" className="hover:underline flex items-center gap-1">
+              📞 +91 8809155327
             </a>
-            <a
-              href="https://wa.me/918809155327"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-sm hover:text-gray-200"
-            >
-              <WhatsAppIcon fontSize="small" />
-              <span>WhatsApp Us</span>
+            <a href="https://wa.me/918809155327" target="_blank" className="hover:underline flex items-center gap-1">
+              🟢 WhatsApp Us
             </a>
           </div>
-          <div className="text-sm">
-            <span>Lalpur, Ranchi, Jharkhand</span>
-          </div>
+          <div>Lalpur, Ranchi, Jharkhand</div>
         </div>
-      </Box>
+      </div>
 
-      <AppBar
-        position="sticky"
-        component={motion.header}
-        initial="hidden"
-        animate="visible"
-        variants={navbarVariants}
-        className={`${scrolled ? "bg-white/95 backdrop-blur-md shadow-md" : "bg-white"} transition-all duration-300`}
-      >
-        <Toolbar className="container-custom py-2">
-          <div className="flex items-center justify-between w-full">
-            <Link href="/" className="flex items-center space-x-2">
-              <Image src="/placeholder.svg?height=40&width=40" alt="San Innovation Logo" width={40} height={40} />
-              <div>
-                <span className="text-xl font-bold text-[rgb(var(--primary))] block leading-tight">San Innovation</span>
-                <span className="text-xs text-gray-600 block leading-tight">E-services PVT LTD</span>
-              </div>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
-              <motion.div custom={0} variants={menuItemVariants}>
-                <Link href="/" className="font-medium hover:text-[rgb(var(--primary))] transition-colors">
-                  Home
-                </Link>
-              </motion.div>
-              <motion.div custom={1} variants={menuItemVariants}>
-                <Link href="/about" className="font-medium hover:text-[rgb(var(--primary))] transition-colors">
-                  About
-                </Link>
-              </motion.div>
-              <motion.div custom={2} variants={menuItemVariants} className="relative group">
-                <Link
-                  href="/services"
-                  className="font-medium hover:text-[rgb(var(--primary))] transition-colors flex items-center"
-                >
-                  Services <ExpandMoreIcon fontSize="small" />
-                </Link>
-                <div className="absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                  <div className="py-1">
-                    <Link href="/services#digital-marketing" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      Digital Marketing
-                    </Link>
-                    <Link href="/services#web-development" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      Web Development
-                    </Link>
-                    <Link href="/services#app-development" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      App Development
-                    </Link>
-                    <Link href="/services#seo" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      SEO Optimization
-                    </Link>
-                    <Link href="/services#social" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      Social Media Marketing
-                    </Link>
-                    <Link href="/services#content" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      Content Marketing
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-              <motion.div custom={3} variants={menuItemVariants} className="relative group">
-                <Link
-                  href="/industries"
-                  className="font-medium hover:text-[rgb(var(--primary))] transition-colors flex items-center"
-                >
-                  Industries <ExpandMoreIcon fontSize="small" />
-                </Link>
-                <div className="absolute left-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                  <div className="py-1">
-                    <Link href="/industries#healthcare" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      Healthcare
-                    </Link>
-                    <Link href="/industries#education" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      Education
-                    </Link>
-                    <Link href="/industries#ecommerce" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      E-Commerce
-                    </Link>
-                    <Link href="/industries#real-estate" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      Real Estate
-                    </Link>
-                    <Link href="/industries#hospitality" className="block px-4 py-2 text-sm hover:bg-gray-100">
-                      Hospitality
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-              <motion.div custom={4} variants={menuItemVariants}>
-                <Link href="/portfolio" className="font-medium hover:text-[rgb(var(--primary))] transition-colors">
-                  Portfolio
-                </Link>
-              </motion.div>
-              <motion.div custom={5} variants={menuItemVariants}>
-                <Link href="/blog" className="font-medium hover:text-[rgb(var(--primary))] transition-colors">
-                  Blog
-                </Link>
-              </motion.div>
-              <motion.div custom={6} variants={menuItemVariants}>
-                <Link href="/contact" className="font-medium hover:text-[rgb(var(--primary))] transition-colors">
-                  Contact
-                </Link>
-              </motion.div>
-            </nav>
-
-            <div className="hidden md:flex items-center space-x-4">
-              <motion.div custom={7} variants={menuItemVariants}>
-                <Button variant="outlined" color="primary" component={Link} href="/contact">
-                  Get a Quote
-                </Button>
-              </motion.div>
-              <motion.div custom={8} variants={menuItemVariants}>
-                <Button variant="contained" color="primary" component={Link} href="/contact">
-                  Contact Us
-                </Button>
-              </motion.div>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <IconButton edge="start" color="primary" aria-label="menu" onClick={toggleMenu} className="md:hidden">
-              <MenuIcon />
-            </IconButton>
+      {/* Main Nav */}
+      <div className="max-w-7xl mx-auto flex justify-between items-center py-3 px-4 md:px-8">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/placeholder.svg" width={40} height={40} alt="Logo" className="w-10 h-10" />
+          <div>
+            <h1 className="text-xl font-bold text-blue-700">San Innovation</h1>
+            <p className="text-xs text-gray-500">E-services Pvt Ltd</p>
           </div>
-        </Toolbar>
+        </Link>
 
-        {/* Mobile Navigation Drawer */}
-        <Drawer anchor="right" open={isMenuOpen} onClose={toggleMenu}>
-          <div className="w-80 h-full flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b">
-              <Link href="/" className="flex items-center space-x-2" onClick={toggleMenu}>
-                <Image src="/placeholder.svg?height=40&width=40" alt="San Innovation Logo" width={40} height={40} />
+        {/* Desktop Menu */}
+        <nav className="hidden md:flex items-center gap-8">
+          {navItems.map(({ label, href }) => (
+            <Link key={label} href={href} className="text-gray-700 hover:text-blue-600 font-medium transition">
+              {label}
+            </Link>
+          ))}
+          {renderDropdown("Services", serviceItems)}
+          {renderDropdown("Industries", industryItems)}
+        </nav>
+
+        {/* Hamburger for Mobile */}
+        <button className="md:hidden" onClick={() => setMenuOpen(true)} aria-label="Open menu">
+          <Menu className="text-black" />
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="fixed inset-0 bg-white z-50 flex flex-col p-6"
+          >
+            <div className="flex justify-between items-center mb-8">
+              <Link href="/" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
+                <Image src="/placeholder.svg" width={40} height={40} alt="Logo" className="w-10 h-10" />
                 <div>
-                  <span className="text-lg font-bold text-[rgb(var(--primary))] block leading-tight">
-                    San Innovation
-                  </span>
-                  <span className="text-xs text-gray-600 block leading-tight">E-services PVT LTD</span>
+                  <h1 className="text-xl font-bold text-blue-700">San Innovation</h1>
+                  <p className="text-xs text-gray-500">E-services Pvt Ltd</p>
                 </div>
               </Link>
-              <IconButton edge="end" color="inherit" aria-label="close" onClick={toggleMenu}>
-                <CloseIcon />
-              </IconButton>
+              <button onClick={() => setMenuOpen(false)} aria-label="Close menu">
+                <X className="text-black" />
+              </button>
             </div>
 
-            <List className="flex-1 py-4">
-              <ListItem button component={Link} href="/" onClick={toggleMenu}>
-                <ListItemText primary="Home" />
-              </ListItem>
-              <ListItem button component={Link} href="/about" onClick={toggleMenu}>
-                <ListItemText primary="About" />
-              </ListItem>
+            <nav className="flex flex-col gap-4">
+              {navItems.map(({ label, href }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  onClick={() => setMenuOpen(false)}
+                  className="text-lg text-gray-700"
+                >
+                  {label}
+                </Link>
+              ))}
 
-              <ListItem button onClick={() => toggleExpand("services")}>
-                <ListItemText primary="Services" />
-                {expandedItems.services ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              </ListItem>
-              <Collapse in={expandedItems.services} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  <ListItem
-                    button
-                    component={Link}
-                    href="/services#digital-marketing"
-                    onClick={toggleMenu}
-                    className="pl-8"
+              <div className="mt-6">
+                <p className="text-gray-700 font-semibold mb-2">Services</p>
+                {serviceItems.map(({ label, href }) => (
+                  <Link
+                    key={label}
+                    href={href}
+                    onClick={() => setMenuOpen(false)}
+                    className="block text-gray-500 mb-2"
                   >
-                    <ListItemText primary="Digital Marketing" />
-                  </ListItem>
-                  <ListItem
-                    button
-                    component={Link}
-                    href="/services#web-development"
-                    onClick={toggleMenu}
-                    className="pl-8"
+                    {label}
+                  </Link>
+                ))}
+              </div>
+
+              <div className="mt-4">
+                <p className="text-gray-700 font-semibold mb-2">Industries</p>
+                {industryItems.map(({ label, href }) => (
+                  <Link
+                    key={label}
+                    href={href}
+                    onClick={() => setMenuOpen(false)}
+                    className="block text-gray-500 mb-2"
                   >
-                    <ListItemText primary="Web Development" />
-                  </ListItem>
-                  <ListItem
-                    button
-                    component={Link}
-                    href="/services#app-development"
-                    onClick={toggleMenu}
-                    className="pl-8"
-                  >
-                    <ListItemText primary="App Development" />
-                  </ListItem>
-                  <ListItem button component={Link} href="/services#seo" onClick={toggleMenu} className="pl-8">
-                    <ListItemText primary="SEO Optimization" />
-                  </ListItem>
-                  <ListItem button component={Link} href="/services#social" onClick={toggleMenu} className="pl-8">
-                    <ListItemText primary="Social Media Marketing" />
-                  </ListItem>
-                </List>
-              </Collapse>
-
-              <ListItem button onClick={() => toggleExpand("industries")}>
-                <ListItemText primary="Industries" />
-                {expandedItems.industries ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              </ListItem>
-              <Collapse in={expandedItems.industries} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  <ListItem button component={Link} href="/industries#healthcare" onClick={toggleMenu} className="pl-8">
-                    <ListItemText primary="Healthcare" />
-                  </ListItem>
-                  <ListItem button component={Link} href="/industries#education" onClick={toggleMenu} className="pl-8">
-                    <ListItemText primary="Education" />
-                  </ListItem>
-                  <ListItem button component={Link} href="/industries#ecommerce" onClick={toggleMenu} className="pl-8">
-                    <ListItemText primary="E-Commerce" />
-                  </ListItem>
-                  <ListItem
-                    button
-                    component={Link}
-                    href="/industries#real-estate"
-                    onClick={toggleMenu}
-                    className="pl-8"
-                  >
-                    <ListItemText primary="Real Estate" />
-                  </ListItem>
-                </List>
-              </Collapse>
-
-              <ListItem button component={Link} href="/portfolio" onClick={toggleMenu}>
-                <ListItemText primary="Portfolio" />
-              </ListItem>
-
-              <ListItem button component={Link} href="/blog" onClick={toggleMenu}>
-                <ListItemText primary="Blog" />
-              </ListItem>
-
-              <ListItem button component={Link} href="/contact" onClick={toggleMenu}>
-                <ListItemText primary="Contact" />
-              </ListItem>
-            </List>
-
-            <div className="p-4 border-t">
-              <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                component={Link}
-                href="/contact"
-                onClick={toggleMenu}
-                className="mb-2"
-              >
-                Contact Us
-              </Button>
-              <Button
-                variant="outlined"
-                color="primary"
-                fullWidth
-                component={Link}
-                href="/contact"
-                onClick={toggleMenu}
-              >
-                Get a Quote
-              </Button>
-            </div>
-          </div>
-        </Drawer>
-      </AppBar>
-    </>
-  )
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
+  );
 }
