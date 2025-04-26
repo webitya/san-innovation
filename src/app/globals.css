@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 245, 245, 245;
+  --primary: 25, 118, 210;
+  --secondary: 103, 58, 183;
+  --accent: 255, 152, 0;
+  --success: 76, 175, 80;
+  --error: 244, 67, 54;
+  --info: 3, 169, 244;
+  --warning: 255, 193, 7;
+}
+
